@@ -1,11 +1,42 @@
 {
   "name": "yamlink",
   "displayName": "Yamlink",
-  "description": "YAML-based ID linking engine",
-  "version": "0.0.1",
+  "description": "Structured knowledge engine for VSCode. Graph-aware Markdown linking with stable YAML identity.",
+  "version": "0.1.0",
+  "publisher": "javierigaciorm",
+  "author": {
+    "name": "Javier Ramirez"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/javierigaciorm/yamlink"
+  },
+  "bugs": {
+    "url": "https://github.com/javierigaciorm/yamlink/issues"
+  },
+  "homepage": "https://github.com/javierigaciorm/yamlink#readme",
   "engines": {
     "vscode": "^1.85.0"
   },
+  "categories": [
+    "Other",
+    "Notebooks"
+  ],
+  "keywords": [
+    "markdown",
+    "knowledge base",
+    "wiki",
+    "graph",
+    "linking",
+    "yaml",
+    "notes",
+    "pkm",
+    "zettelkasten",
+    "crm",
+    "second brain"
+  ],
+  "icon": "icon.png",
   "activationEvents": [
     "onLanguage:markdown"
   ],
@@ -15,9 +46,15 @@
       {
         "command": "yamlink.createNote",
         "title": "Yamlink: Create Note"
+      },
+      {
+        "command": "yamlink.addFrontmatter",
+        "title": "Yamlink: Add Frontmatter"
       }
     ]
   },
-  "scripts": {},
+  "scripts": {
+    "package": "vsce package"
+  },
   "devDependencies": {}
 }
