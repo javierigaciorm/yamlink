@@ -1,0 +1,23 @@
+{
+  "name": "yamlink",
+  "displayName": "Yamlink",
+  "description": "YAML-based ID linking engine",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "yamlink.createNote",
+        "title": "Yamlink: Create Note"
+      }
+    ]
+  },
+  "scripts": {},
+  "devDependencies": {}
+}
