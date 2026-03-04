@@ -3,14 +3,14 @@
   "displayName": "Yamlink",
   "description": "YAML-based ID linking engine",
   "version": "0.1.0",
-  "publisher": "YOUR_PUBLISHER_NAME",
+  "publisher": "Javier Ramírez",
   "icon": "icon.png",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/yamlink"
+    "url": "https://github.com/javierigaciorm/yamlink"
   },
-  "keywords": ["yaml", "wikilink", "knowledge-base", "pkm", "structured-data", "graph"],
+  "keywords": ["yaml", "wikilink", "knowledge-base", "pkm", "structured-data", "crm", "graph"],
   "categories": ["Other", "Programming Languages", "Notebooks"],
   "engines": {
     "vscode": "^1.85.0"

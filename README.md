@@ -126,6 +126,8 @@ Invalid:
 
 The filename is cosmetic. The `id:` is canonical.
 
+**Field names follow the same rule.** Use hyphens instead of spaces in YAML field names — `related-contacts` not `related contacts`. Fields with spaces will not be recognized as graph edges.
+
 ---
 
 ## Diagnostics
