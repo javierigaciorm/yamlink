@@ -1,117 +1,172 @@
 # Yamlink
 
-**Structured knowledge engine for VSCode. Graph-aware Markdown linking with stable YAML identity.**
+Structured knowledge engine for VS Code.
 
-Stop managing filenames. Yamlink makes your `id:` the permanent address of every note.
+Yamlink makes the `id:` field in YAML frontmatter the canonical identity of every Markdown note.
+
+Rename files freely. Change identity deliberately.
 
 ---
 
 ## The Problem
 
-Markdown linking is filename-based and fragile. Rename a file and every link breaks. Types are inconsistent. Structure is optional and unenforced. Your vault is a folder of files, not a knowledge system.
+Most Markdown linking systems rely on filenames. Over time, renaming files breaks references and structure drifts. A vault becomes a loose collection of documents rather than a coherent system.
 
-## The Core Idea
+Yamlink separates identity from filenames.
 
-Yamlink treats `id:` in YAML frontmatter as canonical identity. Not the filename.
+---
+
+## Core Idea
+
+Identity lives in YAML frontmatter.
+
 ```yaml
 ---
 id: company-acme
 type: account
+created: 2024-01-15
 ---
 ```
 
-Once a node has an `id:`, it becomes:
-- **Linkable** — `[[company-acme]]` works from anywhere in the vault
-- **Navigable** — Ctrl+Click jumps to it instantly
-- **Renameable** — change the file name, nothing breaks
-- **Propagating** — change the `id:`, every reference updates vault-wide
+Once a file declares an `id:`:
+
+- It becomes linkable via `[[company-acme]]`
+- Ctrl+Click navigates directly to it
+- The filename can change without breaking references
+- Changing the `id:` triggers controlled rename propagation
 
 ---
 
-## What It Does Today
+## Rename Propagation
 
-- **Stable identity** — `id:` is the canonical address, filename is cosmetic
-- **[[Wikilink]] autocomplete** — live filtering of all indexed nodes
-- **Ctrl+Click navigation** — jump to any node by ID
-- **Hover preview** — YAML fields + body preview on hover
-- **Vault-wide rename propagation** — change `id:` and all `[[refs]]` update with confirmation
-- **Real-time diagnostics** — broken links flagged instantly as you type
-- **Type registry** — observational, purely derived from your vault
-- **Quick fixes** — create a node from a broken link, add frontmatter to plain files
-- **Graph layer** — inbound and outbound edges tracked in memory
+Yamlink treats identity mutation as a structural event.
 
-## What's Coming
+When you change an `id:` and save:
 
-- Schema enforcement — declare expected fields per type
-- Query blocks — live tables from fenced `yamlink-query` blocks
-- Backlinks sidebar panel
-- Graph visualization
-- Typed views and structured exports
+- The vault is scanned for references to the old ID
+- You are prompted before changes are applied
+- Large updates can be previewed
+- You can revert the ID change if needed
+
+References are never silently broken.
 
 ---
 
-## Philosophy
+## Current Capabilities (0.1.0 – Apollo)
 
-- **Local-first** — your files, your folder, no cloud
-- **Git-native** — plain Markdown, fully version-controllable
-- **Zero lock-in** — disable the extension, files stay valid Markdown
-- **Schema-optional** — structure when you want it, never forced
-- **No domain assumptions** — works for CRM, research, content ops, project management
+- Canonical `id:` identity model
+- Vault-wide rename propagation
+- Wikilink autocomplete
+- Ctrl+Click navigation
+- Hover preview (frontmatter + body snippet)
+- Hybrid graph model:
+  - YAML relations (field-labeled edges)
+  - Body wikilinks
+- Backlinks panel in the Explorer
+- Duplicate ID detection
+- Real-time diagnostics
+- Observational type registry
+- Strict ID validation (letters, numbers, hyphens, underscores)
 
 ---
-## How It’s Different
 
-Yamlink is not a note-taking app. Per se.
-It is a structural layer inside VSCode.
+## Backlinks
 
-No custom vault format.
-No proprietary graph database.
-No sync layer.
-Just Markdown + identity + structure.
-Applications are endless.
+The Backlinks panel shows inbound links to the active file.
+
+YAML field relations preserve their field name:
+
+```text
+project-alpha    owner
+meeting-2024     related
+```
+
+Body wikilinks are labeled as `body`.
 
 ---
 
 ## Getting Started
 
-1. Open any folder in VSCode
-2. Create a Markdown file with a YAML frontmatter `id:` field
-3. Start linking with `[[id]]`
-```markdown
+1. Open a folder in VS Code.
+2. Run `Yamlink: Create Node` from the Command Palette.
+3. Enter an ID (letters, numbers, hyphens, underscores only).
+
+Example:
+
+```yaml
 ---
 id: my-first-node
-type: note
+created: 2024-01-15
 ---
-
-This links to [[another-node]].
 ```
 
-That's it. Yamlink indexes it immediately.
+Start linking using:
+
+```markdown
+[[my-first-node]]
+```
 
 ---
 
-## Layers
+## ID Rules
 
-| Layer | What it means |
-|---|---|
-| 0 | Plain `.md` file — valid Markdown, not a Yamlink node |
-| 1 | File with `id:` — indexed, linkable, navigable |
-| 2 | Node with `type:` — typed entity |
-| 3 | YAML field with `[[wikilink]]` — directed graph edge |
-| 4 | Schema definition — validation and enforcement *(coming)* |
+Valid:
+
+- project-alpha
+- contact_jane
+- meeting-2024-01-15
+
+Invalid:
+
+- My Project
+- note#1
+
+The filename is cosmetic. The `id:` is canonical.
 
 ---
 
-## Installation
+## Diagnostics
 
-Search for "Yamlink" in the VS Code Extensions Marketplace.
-Or install via VSIX package.
+Yamlink surfaces structural issues as you work.
+
+- `yamlink.missingId` — file has no `id:` and is not indexed
+- `yamlink.duplicateId` — same `id:` declared in multiple files
+- `yamlink.brokenLink` — body link references a non-existent node
+- `yamlink.brokenRelation` — YAML relation references a non-existent node
+- `yamlink.unknownType` — new or unseen `type:` value
+- `yamlink.singletonType` — `type:` appears on only one node
+
+All diagnostics are non-destructive and fixable.
+
+---
+
+## Philosophy
+
+- Local-first
+- Git-native
+- Schema-optional
+- No proprietary storage
+- Files remain valid Markdown if the extension is disabled
+
+---
+
+## Roadmap
+
+In development:
+
+- Schema enforcement
+- Field suggestions based on type
+- Query blocks
+- Dedicated sidebar container
+- Graph visualization
 
 ---
 
 ## Version
 
-`0.1.0` — Early Access. Core engine is stable. Schema enforcement and query layer in active development.
+0.1.0 — Apollo
+
+Identity engine, hybrid graph, and backlinks panel.
 
 ---
 

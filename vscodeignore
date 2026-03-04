@@ -1,0 +1,8 @@
+.git
+.gitignore
+.vscode/**
+.vscode-test/**
+node_modules/**
+**/*.map
+**/*.ts
+README-draft.md

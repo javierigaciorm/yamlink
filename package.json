@@ -1,42 +1,20 @@
 {
   "name": "yamlink",
   "displayName": "Yamlink",
-  "description": "Structured knowledge engine for VSCode. Graph-aware Markdown linking with stable YAML identity.",
+  "description": "YAML-based ID linking engine",
   "version": "0.1.0",
-  "publisher": "javierigaciorm",
-  "author": {
-    "name": "Javier Ramirez"
-  },
+  "publisher": "YOUR_PUBLISHER_NAME",
+  "icon": "icon.png",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/javierigaciorm/yamlink"
+    "url": "https://github.com/YOUR_USERNAME/yamlink"
   },
-  "bugs": {
-    "url": "https://github.com/javierigaciorm/yamlink/issues"
-  },
-  "homepage": "https://github.com/javierigaciorm/yamlink#readme",
+  "keywords": ["yaml", "wikilink", "knowledge-base", "pkm", "structured-data", "graph"],
+  "categories": ["Other", "Programming Languages", "Notebooks"],
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": [
-    "Other",
-    "Notebooks"
-  ],
-  "keywords": [
-    "markdown",
-    "knowledge base",
-    "wiki",
-    "graph",
-    "linking",
-    "yaml",
-    "notes",
-    "pkm",
-    "zettelkasten",
-    "crm",
-    "second brain"
-  ],
-  "icon": "icon.png",
   "activationEvents": [
     "onLanguage:markdown"
   ],
@@ -44,17 +22,22 @@
   "contributes": {
     "commands": [
       {
-        "command": "yamlink.createNote",
-        "title": "Yamlink: Create Note"
-      },
-      {
-        "command": "yamlink.addFrontmatter",
-        "title": "Yamlink: Add Frontmatter"
+        "command": "yamlink.createNode",
+        "title": "Yamlink: Create Node"
       }
-    ]
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "yamlink.backlinks",
+          "name": "Yamlink Backlinks"
+        }
+      ]
+    }
   },
-  "scripts": {
-    "package": "vsce package"
+  "scripts": {},
+  "dependencies": {
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {}
 }

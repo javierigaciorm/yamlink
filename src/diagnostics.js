@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const { isSingleton, isKnownType } = require('./typeRegistry');
+const { getDuplicateIndex } = require('./index');
 
 let diagnosticCollection;
 let debounceTimer;
@@ -55,12 +56,50 @@ function validateDocument(document, getIndex) {
     if (!hasFrontmatter || !hasId) {
         const diagnostic = new vscode.Diagnostic(
             new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
-            `Yamlink: This file has no id field and will not be indexed as a node.`,
+            `Yamlink: This file is plain Markdown. Add an id to make it a Yamlink node.`,
             vscode.DiagnosticSeverity.Hint
         );
         diagnostic.source = "yamlink";
         diagnostic.code   = "yamlink.missingId";
         diagnostics.push(diagnostic);
+    }
+
+    // ─────────────────────────────────────────────
+    // Diagnostic 2: Duplicate id — two or more files
+    // share the same id: value. First writer wins in
+    // the index; all others are invisible to the graph.
+    // Warning — real structural conflict, not advisory.
+    // ─────────────────────────────────────────────
+    if (hasFrontmatter && hasId) {
+        const duplicates = getDuplicateIndex();
+        const filePath   = document.uri.fsPath;
+
+        for (const [id, paths] of duplicates) {
+            if (!paths.has(filePath)) continue;
+
+            // Find the line with this id: value to anchor the diagnostic
+            const idLineIndex = text
+                .split('\n')
+                .findIndex(line => new RegExp(`^\\s*id:\\s*${id}\\s*$`).test(line));
+
+            const range = idLineIndex !== -1
+                ? document.lineAt(idLineIndex).range
+                : new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0));
+
+            const otherPaths = [...paths]
+                .filter(p => p !== filePath)
+                .map(p => p.split(/[\\/]/).pop()) // basename only
+                .join(', ');
+
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                `Yamlink: ID "${id}" is also declared in: ${otherPaths}. Only one file will be indexed.`,
+                vscode.DiagnosticSeverity.Warning
+            );
+            diagnostic.source = "yamlink";
+            diagnostic.code   = "yamlink.duplicateId";
+            diagnostics.push(diagnostic);
+        }
     }
 
     // ─────────────────────────────────────────────
