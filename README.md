@@ -6,6 +6,9 @@ Yamlink makes the `id:` field in YAML frontmatter the canonical identity of ever
 
 Rename files freely. Change identity deliberately.
 
+
+![Yamlink Demo](media/demo.gif)
+
 ---
 
 ## The Problem
