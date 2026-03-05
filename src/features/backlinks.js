@@ -25,8 +25,8 @@
 // ─────────────────────────────────────────────────────────────────
 
 const vscode = require('vscode');
-const { getBacklinks } = require('./graph');
-const { getIndex, getPathIndex } = require('./index');
+const { getBacklinks } = require('../core/graph');
+const { getIndex, getPathIndex } = require('../core/index');
 
 class BacklinksProvider {
     constructor() {

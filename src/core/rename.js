@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
-const { validateAll } = require('./diagnostics');
+const { validateAll } = require('../diagnostics/diagnostics');
 
 const PREVIEW_THRESHOLD = 5;
 
@@ -131,6 +131,12 @@ async function applyWithGuard(edit, options = {}) {
     isPropagating = true;
     try {
         await vscode.workspace.applyEdit(edit, options);
+        // Flush edits to disk immediately. buildIndex reads from disk,
+        // not from VS Code's in-memory buffers. Without this, a second
+        // rename scans disk, finds the old content, and silently no-ops.
+        // isPropagating is still true here so the save handler won't
+        // re-trigger rename detection for these files.
+        await vscode.workspace.saveAll(false);
     } finally {
         await new Promise(resolve => setTimeout(resolve, 300));
         isPropagating = false;

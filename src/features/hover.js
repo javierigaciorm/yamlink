@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 const fs     = require('fs');
-const { parseFrontmatter } = require('./index');
+const { parseFrontmatter } = require('../core/index');
 
 // ─────────────────────────────────────────────────────────────────
 // hover.js — Hover preview (Stage 2B)
@@ -94,10 +94,11 @@ function buildHoverContent(id, content, filePath) {
 // Returns first N non-empty lines after the frontmatter block
 // ─────────────────────────────────────────────────────────────────
 function extractBodyPreview(content) {
-    // Find end of frontmatter
+    // Find end of frontmatter — use regex to tolerate BOM / leading whitespace
     let bodyStart = 0;
-    if (content.startsWith('---')) {
-        const closingIndex = content.indexOf('---', 3);
+    if (/^\s*---/.test(content)) {
+        const firstDash    = content.indexOf('---');
+        const closingIndex = content.indexOf('---', firstDash + 3);
         if (closingIndex !== -1) {
             bodyStart = closingIndex + 3;
         }
