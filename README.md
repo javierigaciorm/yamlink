@@ -2,7 +2,7 @@
 
 ---
 
-![Yamlink Demo](https://claude.ai/chat/media/demo.gif)
+![Yamlink Demo](media/demo.gif)
 
 ---
 
