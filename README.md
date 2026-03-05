@@ -40,7 +40,6 @@ Yamlink separates **identity** from **filenames**.
 Every node declares its identity in YAML frontmatter:
 =======
 Each Markdown file declares a canonical `id:` in YAML frontmatter. That identity becomes the permanent node of your vault — linkable, navigable, and rename-safe.
->>>>>>> fcb75a3 (Update README and marketplace metadata)
 
 ```yaml
 ---
