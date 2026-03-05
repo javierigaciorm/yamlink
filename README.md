@@ -5,6 +5,8 @@
 ![Yamlink Demo](media/demo.gif)
 
 ---
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/yamlink.yamlink)](https://marketplace.visualstudio.com/items?itemName=yamlink.yamlink)
+---
 
 Yamlink turns Markdown vaults into **structured knowledge systems**.
 
