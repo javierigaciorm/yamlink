@@ -1,7 +1,7 @@
 {
   "name": "yamlink",
   "displayName": "Yamlink",
-  "description": "Structured knowledge engine for VS Code. Canonical id: identity, vault-wide linking, and real-time diagnostics for Markdown notes.",
+  "description": "Turn Markdown into a structured knowledge system. Canonical IDs, vault-wide linking, backlinks, and real-time diagnostics for YAML-based knowledge graphs.",
   "version": "0.1.0",
   "publisher": "yamlink",
   "author": {
@@ -20,12 +20,17 @@
     "markdown",
     "notes",
     "knowledge-base",
+    "knowledge-graph".
     "wikilinks",
     "zettelkasten",
     "pkm",
     "crm",
     "frontmatter",
     "yaml",
+    "obsidian",
+    "logseq",
+    "developer-tools",
+    "data-modeling",
     "graph"
   ],
   "engines": {
