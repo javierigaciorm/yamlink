@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const { isKnownType } = require('../registries/typeRegistry');
+const { hasSchema, getSchema, getDuplicateSchemas } = require('../registries/schemaRegistry');
 const { getDuplicateIds } = require('../core/index');
 
 const MIN_VAULT_SIZE_FOR_TYPE_ADVISORY = 10;
@@ -39,6 +40,13 @@ function validateAll(getIndex) {
             validateDocument(doc, getIndex);
         }
     });
+}
+
+// Wipes all diagnostics across all files.
+// Called in rebuildAll() before validateAll() so stale diagnostics
+// from deleted or renamed files never linger in the status bar count.
+function clearAll() {
+    if (diagnosticCollection) diagnosticCollection.clear();
 }
 
 function validateDocument(document, getIndex) {
@@ -98,11 +106,6 @@ function validateDocument(document, getIndex) {
 
     // ─────────────────────────────────────────────
     // Diagnostic 2: Broken [[links]]
-    //
-    // Scan the ENTIRE document once for [[links]].
-    // Report as brokenRelation if inside frontmatter,
-    // brokenLink if in body. Never double-report the
-    // same position.
     // ─────────────────────────────────────────────
     let frontmatterEnd = 0;
     if (hasFrontmatter) {
@@ -115,7 +118,7 @@ function validateDocument(document, getIndex) {
     let match;
 
     while ((match = linkRegex.exec(text)) !== null) {
-        const id            = match[1].trim();
+        const id              = match[1].trim();
         const isInFrontmatter = frontmatterEnd > 0 && match.index < frontmatterEnd;
 
         if (!idIndex.has(id)) {
@@ -123,7 +126,6 @@ function validateDocument(document, getIndex) {
                 document.positionAt(match.index),
                 document.positionAt(match.index + match[0].length)
             );
-
             const diagnostic = new vscode.Diagnostic(
                 range,
                 isInFrontmatter
@@ -141,9 +143,6 @@ function validateDocument(document, getIndex) {
 
     // ─────────────────────────────────────────────
     // Diagnostic 3: Unknown type advisory
-    // Only fires in large vaults — small vaults
-    // building out structure should never see this.
-    // Singleton case removed entirely.
     // ─────────────────────────────────────────────
     if (hasFrontmatter && idIndex.size >= MIN_VAULT_SIZE_FOR_TYPE_ADVISORY) {
         const typeMatch = text.match(/^\s*type:\s*(.+?)\s*$/m);
@@ -167,13 +166,93 @@ function validateDocument(document, getIndex) {
         }
     }
 
+    // ─────────────────────────────────────────────
+    // Diagnostic 4: Missing required schema fields
+    // ─────────────────────────────────────────────
+    if (hasFrontmatter && hasId) {
+        const typeMatch = text.match(/^\s*type:\s*(.+?)\s*$/m);
+        if (typeMatch) {
+            const typeValue = typeMatch[1].trim();
+            if (hasSchema(typeValue)) {
+                const schema = getSchema(typeValue);
+
+                const firstDash    = text.indexOf('---');
+                const closingIndex = text.indexOf('---', firstDash + 3);
+                const fmText       = closingIndex !== -1
+                    ? text.slice(firstDash + 3, closingIndex)
+                    : '';
+
+                const typeLineIndex = text
+                    .split('\n')
+                    .findIndex(l => /^\s*type:\s*.+/.test(l));
+
+                for (const [fieldName, fieldDef] of Object.entries(schema.fields)) {
+                    if (!fieldDef.required) continue;
+
+                    const fieldPresent = new RegExp(
+                        `^\\s*${fieldName}:\\s*.+`, 'm'
+                    ).test(fmText);
+
+                    if (!fieldPresent) {
+                        const range = typeLineIndex !== -1
+                            ? document.lineAt(typeLineIndex).range
+                            : new vscode.Range(
+                                new vscode.Position(0, 0),
+                                new vscode.Position(0, 0)
+                            );
+                        const diagnostic = new vscode.Diagnostic(
+                            range,
+                            `Yamlink: Required field "${fieldName}" is missing` +
+                            ` (schema: ${schema.sourceId})`,
+                            vscode.DiagnosticSeverity.Warning
+                        );
+                        diagnostic.source = "yamlink";
+                        diagnostic.code   = "yamlink.missingRequiredField";
+                        diagnostics.push(diagnostic);
+                    }
+                }
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Diagnostic 5: Duplicate schema
+    // ─────────────────────────────────────────────
+    if (hasFrontmatter && hasId) {
+        const isSchemaNode = /^\s*type:\s*schema\s*$/im.test(text);
+        if (isSchemaNode) {
+            const targetMatch = text.match(/^\s*target:\s*(.+?)\s*$/m);
+            if (targetMatch) {
+                const targetType = targetMatch[1].trim().toLowerCase();
+                const dupSchemas = getDuplicateSchemas();
+                if (dupSchemas.has(targetType)) {
+                    const targetLineIndex = text
+                        .split('\n')
+                        .findIndex(l => /^\s*target:\s*.+/.test(l));
+                    const range = targetLineIndex !== -1
+                        ? document.lineAt(targetLineIndex).range
+                        : new vscode.Range(
+                            new vscode.Position(0, 0),
+                            new vscode.Position(0, 0)
+                        );
+                    const canonical = dupSchemas.get(targetType)[0];
+                    const diagnostic = new vscode.Diagnostic(
+                        range,
+                        `Yamlink: A schema for "${targetType}" already exists` +
+                        ` in "${canonical}" — this schema will be ignored.`,
+                        vscode.DiagnosticSeverity.Warning
+                    );
+                    diagnostic.source = "yamlink";
+                    diagnostic.code   = "yamlink.duplicateSchema";
+                    diagnostics.push(diagnostic);
+                }
+            }
+        }
+    }
+
     diagnosticCollection.set(document.uri, diagnostics);
 }
 
-// ─────────────────────────────────────────────────────────────────
-// getBrokenCount — counts broken link/relation diagnostics across
-// all open documents. Used by the status bar in extension.js.
-// ─────────────────────────────────────────────────────────────────
 function getBrokenCount() {
     if (!diagnosticCollection) return 0;
     let count = 0;
@@ -189,5 +268,6 @@ module.exports = {
     registerDiagnostics,
     validateAll,
     validateDocument,
+    clearAll,
     getBrokenCount
 };

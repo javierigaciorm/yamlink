@@ -1,39 +1,12 @@
 # Yamlink
 
-Structured knowledge engine systems for VS Code.
+Structured knowledge for Markdown inside VS Code.
 
 [![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/yamlink.yamlink?label=Marketplace)](https://marketplace.visualstudio.com/items?itemName=yamlink.yamlink) ![Version](https://img.shields.io/badge/version-0.1.0--Apollo-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blueviolet)
 
-Yamlink turns Markdown vaults into **structured knowledge systems** built on a simple idea: identity belongs in your frontmatter, not your filenames.
+Yamlink turns Markdown vaults into structured knowledge systems by giving each file a stable identity in YAML frontmatter instead of relying on filenames.
 
 ![Yamlink Demo](media/demo.gif)
-
----
-
-Yamlink turns Markdown vaults into **structured knowledge systems**.
-
-Instead of relying on filenames as identity, each Markdown file declares a canonical `id:` in YAML frontmatter. That identity becomes the permanent node of your vault — linkable, navigable, and rename-safe.
-
-Use Yamlink to build:
-
-- Personal knowledge bases
-- Research databases and literature maps
-- CRM-style relationship graphs
-- Project and architecture knowledge systems
-- Documentation knowledge graphs
-- World-building and narrative systems
-
-All local-first. All Git-native.
-
----
-
-## Install
-
-Install Yamlink directly from the VS Code Marketplace:
-
-https://marketplace.visualstudio.com/items?itemName=yamlink.yamlink
-
-Or search **"Yamlink"** in the VS Code Extensions panel.
 
 ---
 
@@ -44,12 +17,9 @@ Most Markdown linking systems rely on filenames. Over time, files are renamed, r
 Yamlink separates **identity** from **filenames**.
 
 ---
-
 ## The Core Idea
 
-Every node declares its identity in YAML frontmatter:
-=======
-Each Markdown file declares a canonical `id:` in YAML frontmatter. That identity becomes the permanent node of your vault — linkable, navigable, and rename-safe.
+Each Markdown file declares a canonical `id:` in YAML frontmatter. That `id` becomes the stable identity of the node — so links remain valid even if files are renamed or moved.
 
 ```yaml
 ---
@@ -72,11 +42,13 @@ All local-first. All Git-native.
 
 ---
 
-## The Problem
+## Install
 
-Most Markdown linking systems rely on filenames. Rename a file and every reference breaks. Over time, a vault drifts into a loose collection of documents with no coherent structure.
+Install Yamlink directly from the VS Code Marketplace:
 
-Yamlink separates **identity** from **filenames**.
+https://marketplace.visualstudio.com/items?itemName=yamlink.yamlink
+
+Or search **"Yamlink"** in the VS Code Extensions panel.
 
 ---
 
@@ -181,10 +153,10 @@ All diagnostics are non-destructive. Every warning has a Quick Fix.
 IDs use letters, numbers, hyphens, and underscores only.
 
 ```
-elara-voss          ✓
-concept_recursion   ✓
-Elara Voss          ✗  spaces not allowed
-note#1              ✗  special characters not allowed
+dizzie-flores          ✓
+concept_recursion      ✓
+Dizzie Flores          ✗  spaces not allowed
+note#1                 ✗  special characters not allowed
 ```
 
 The same rule applies to field names. Use `related-concepts` not `related concepts` — fields with spaces are not recognized as graph edges.

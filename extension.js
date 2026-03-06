@@ -3,7 +3,7 @@ const { buildIndex, getIndex, getPathIndex } = require('./src/core/index');
 const { registerDefinition } = require('./src/features/definition');
 const { registerCompletion } = require('./src/features/completion');
 const { registerHover } = require('./src/features/hover');
-const { registerDiagnostics, validateAll, getBrokenCount } = require('./src/diagnostics/diagnostics');
+const { registerDiagnostics, validateAll, getBrokenCount, clearAll } = require('./src/diagnostics/diagnostics');
 const { registerCodeActions } = require('./src/actions/codeActions');
 const { registerRename } = require('./src/core/rename');
 const { registerBacklinks } = require('./src/features/backlinks');
@@ -12,8 +12,6 @@ function activate(context) {
     console.log("Yamlink activated");
 
     // ── Status bar ──────────────────────────────────────────────────
-    // Sits in the bottom bar, left side. Shows live node count and
-    // turns orange with a count if any broken links exist.
     const statusBar = vscode.window.createStatusBarItem(
         vscode.StatusBarAlignment.Left, 100
     );
@@ -37,7 +35,6 @@ function activate(context) {
     buildIndex(vscode.workspace.workspaceFolders);
 
     // Providers — registerDiagnostics MUST come before validateAll.
-    // It creates diagnosticCollection. Without it, validateAll silently no-ops.
     registerDefinition(context, getIndex);
     registerCompletion(context, getIndex);
     registerHover(context, getIndex);
@@ -46,35 +43,34 @@ function activate(context) {
     registerRename(context, getIndex, getPathIndex, buildIndex, validateAll);
     const backlinksProvider = registerBacklinks(context);
 
-    // Now diagnosticCollection exists — validateAll and status bar will fire
     validateAll(getIndex);
     updateStatusBar();
 
-    // Helper: full rebuild cycle for all file-system events
+    // ── Full rebuild cycle ───────────────────────────────────────────
+    // clearAll() wipes stale diagnostics from deleted/renamed files
+    // before the fresh validateAll() pass. Without this, deleted files
+    // leave their diagnostics behind and the status bar stays orange.
     function rebuildAll() {
         if (!vscode.workspace.workspaceFolders) return;
         buildIndex(vscode.workspace.workspaceFolders);
+        clearAll();
         validateAll(getIndex);
         backlinksProvider.refresh();
         updateStatusBar();
     }
 
-    // File renamed — filename is cosmetic, rebuild only
     context.subscriptions.push(
         vscode.workspace.onDidRenameFiles(() => rebuildAll())
     );
 
-    // File deleted — links to it surface as broken
     context.subscriptions.push(
         vscode.workspace.onDidDeleteFiles(() => rebuildAll())
     );
 
-    // File created externally — new nodes become available
     context.subscriptions.push(
         vscode.workspace.onDidCreateFiles(() => rebuildAll())
     );
 
-    // Update status bar after every save so broken count stays live
     context.subscriptions.push(
         vscode.workspace.onDidSaveTextDocument(() => updateStatusBar())
     );
