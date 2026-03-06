@@ -1,6 +1,6 @@
 # Yamlink
 
-Structured knowledge engine for VS Code.
+Structured knowledge engine systems for VS Code.
 
 [![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/yamlink.yamlink?label=Marketplace)](https://marketplace.visualstudio.com/items?itemName=yamlink.yamlink) ![Version](https://img.shields.io/badge/version-0.1.0--Apollo-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blueviolet)
 
@@ -24,6 +24,16 @@ Use Yamlink to build:
 - World-building and narrative systems
 
 All local-first. All Git-native.
+
+---
+
+## Install
+
+Install Yamlink directly from the VS Code Marketplace:
+
+https://marketplace.visualstudio.com/items?itemName=yamlink.yamlink
+
+Or search **"Yamlink"** in the VS Code Extensions panel.
 
 ---
 
