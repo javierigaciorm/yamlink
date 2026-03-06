@@ -3,6 +3,10 @@
 ## [Unreleased]
 <!-- 0.2.0 in progress: schema enforcement + field suggestions -->
 
+### Fixed
+- Diagnostics improvements and stability fixes
+- Minor extension debugging and internal cleanup
+
 ## 0.1.0 — "Apollo"
 
 ### Added
